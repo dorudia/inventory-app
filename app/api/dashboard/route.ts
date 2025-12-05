@@ -73,8 +73,8 @@ export async function GET(request: Request) {
       weeklyData.push({ week: weekLabel, products: count });
     }
 
-    // Recent products for stock levels (5 most recent)
-    const recentProducts = products.slice(0, 5).map((p) => ({
+    // Recent products for stock levels (6 most recent)
+    const recentProducts = products.slice(0, 6).map((p) => ({
       name: p.name,
       quantity: p.quantity,
       lowStockAt: p.lowStockAt,

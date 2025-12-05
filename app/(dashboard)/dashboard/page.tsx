@@ -117,42 +117,37 @@ const DashboardPage = () => {
           <h2 className="text-lg font-semibold text-slate-600 mb-4">
             Key Metrics
           </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Package className="w-8 h-8 text-purple-600" />
-                <div>
-                  <p className="text-sm text-slate-600">Total Products</p>
-                  <p className="text-2xl font-bold text-slate-800">
-                    {data.metrics.totalProducts}
-                  </p>
-                </div>
-              </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+              <Package className="w-7 h-7 text-purple-600" />
+              <p className="text-sm text-slate-600 flex-1">Total Products</p>
+              <p className="text-xl font-bold text-slate-800">
+                {data.metrics.totalProducts}
+              </p>
             </div>
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <DollarSign className="w-8 h-8 text-green-600" />
-                <div>
-                  <p className="text-sm text-slate-600">Total Value</p>
-                  <p className="text-2xl font-bold text-slate-800">
-                    {settings.currency === "lei"
-                      ? `${data.metrics.totalValue.toLocaleString()} ${settings.currency}`
-                      : `${settings.currency}${data.metrics.totalValue.toLocaleString()}`
-                    }
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+              <DollarSign className="w-7 h-7 text-green-600" />
+              <p className="text-sm text-slate-600 flex-1">Total Value</p>
+              <p className="text-xl font-bold text-slate-800">
+                {settings.currency === "lei"
+                  ? `${data.metrics.totalValue.toLocaleString()} ${settings.currency}`
+                  : `${settings.currency}${data.metrics.totalValue.toLocaleString()}`
+                }
+              </p>
             </div>
-            <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-8 h-8 text-amber-600" />
-                <div>
-                  <p className="text-sm text-slate-600">Low Stock Items</p>
-                  <p className="text-2xl font-bold text-slate-800">
-                    {data.metrics.lowStock}
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+              <AlertTriangle className="w-7 h-7 text-amber-600" />
+              <p className="text-sm text-slate-600 flex-1">Low Stock Items</p>
+              <p className="text-xl font-bold text-slate-800">
+                {data.metrics.lowStock}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+              <Package className="w-7 h-7 text-red-600" />
+              <p className="text-sm text-slate-600 flex-1">Out of Stock</p>
+              <p className="text-xl font-bold text-slate-800">
+                {data.metrics.outOfStock}
+              </p>
             </div>
           </div>
         </div>
@@ -233,7 +228,7 @@ const DashboardPage = () => {
           <h2 className="text-lg font-semibold text-slate-600 mb-4">
             Stock Levels
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {data.recentProducts.map((product, idx) => {
               const statusColor =
                 product.status === 0
@@ -251,20 +246,14 @@ const DashboardPage = () => {
               return (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                  className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg"
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-3 h-3 rounded-full ${statusColor}`}
-                    ></div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">
-                        {product.name}
-                      </p>
-                      <p className="text-xs text-slate-500">{statusText}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-semibold text-slate-700">
+                  <div className={`w-2.5 h-2.5 rounded-full ${statusColor}`}></div>
+                  <p className="text-sm font-medium text-slate-800 flex-1">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-slate-500 min-w-20">{statusText}</p>
+                  <p className="text-sm font-semibold text-slate-700 min-w-10 text-right">
                     {product.quantity}
                   </p>
                 </div>
@@ -279,32 +268,32 @@ const DashboardPage = () => {
             Efficiency
           </h2>
           <div className="flex items-center justify-center">
-            <div className="relative w-48 h-48">
+            <div className="relative w-36 h-36" style={{ transform: 'scale(1.5)' }}>
               <svg className="w-full h-full transform -rotate-90">
                 <circle
-                  cx="96"
-                  cy="96"
-                  r="80"
+                  cx="72"
+                  cy="72"
+                  r="60"
                   stroke="#e5e7eb"
-                  strokeWidth="16"
+                  strokeWidth="12"
                   fill="none"
                 />
                 <circle
-                  cx="96"
-                  cy="96"
-                  r="80"
+                  cx="72"
+                  cy="72"
+                  r="60"
                   stroke="#10b981"
-                  strokeWidth="16"
+                  strokeWidth="12"
                   fill="none"
                   strokeDasharray={`${
-                    (data.efficiency.inStockPercent / 100) * 502.4
-                  } 502.4`}
+                    (data.efficiency.inStockPercent / 100) * 376.8
+                  } 376.8`}
                   strokeLinecap="round"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-800">
+                  <p className="text-2xl font-bold text-slate-800">
                     {data.efficiency.inStockPercent}%
                   </p>
                   <p className="text-xs text-slate-500">In Stock</p>
@@ -312,10 +301,10 @@ const DashboardPage = () => {
               </div>
             </div>
           </div>
-          <div className="mt-6 space-y-2">
+          <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <span className="text-slate-600">Out of Stock</span>
               </div>
               <span className="font-semibold text-slate-800">
@@ -324,7 +313,7 @@ const DashboardPage = () => {
             </div>
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
                 <span className="text-slate-600">Low Stock</span>
               </div>
               <span className="font-semibold text-slate-800">
@@ -333,7 +322,7 @@ const DashboardPage = () => {
             </div>
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                 <span className="text-slate-600">In Stock</span>
               </div>
               <span className="font-semibold text-slate-800">

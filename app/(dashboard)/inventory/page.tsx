@@ -26,6 +26,9 @@ const InventoryPage = () => {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   const fetchProducts = () => {
     if (!activeInventory) return;
@@ -53,15 +56,22 @@ const InventoryPage = () => {
   }, [search, filter, activeInventory]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    setProductToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
 
     try {
-      const response = await fetch(`/api/products/${id}`, {
+      const response = await fetch(`/api/products/${productToDelete}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         fetchProducts();
+        setShowDeleteModal(false);
+        setProductToDelete(null);
       } else {
         alert("Failed to delete product");
       }
@@ -77,8 +87,10 @@ const InventoryPage = () => {
       return;
     }
 
-    if (!confirm(`Delete ${selectedProducts.length} products?`)) return;
+    setShowBulkDeleteModal(true);
+  };
 
+  const confirmBulkDelete = async () => {
     try {
       const response = await fetch("/api/products/bulk-delete", {
         method: "POST",
@@ -89,6 +101,7 @@ const InventoryPage = () => {
       if (response.ok) {
         setSelectedProducts([]);
         fetchProducts();
+        setShowBulkDeleteModal(false);
       } else {
         alert("Failed to delete products");
       }
@@ -330,7 +343,7 @@ const InventoryPage = () => {
 
       {/* Product Details Modal */}
       {showDetailsModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-slate-800">
@@ -437,6 +450,89 @@ const InventoryPage = () => {
                 className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800">
+                  Delete Product
+                </h2>
+                <p className="text-sm text-slate-500">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-600 mb-6">
+              Are you sure you want to delete this product? All product data will be permanently removed.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setProductToDelete(null);
+                }}
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800">
+                  Delete Multiple Products
+                </h2>
+                <p className="text-sm text-slate-500">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-600 mb-6">
+              Are you sure you want to delete <strong>{selectedProducts.length}</strong> {selectedProducts.length === 1 ? 'product' : 'products'}? All data will be permanently removed.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBulkDeleteModal(false)}
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmBulkDelete}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                Delete All
               </button>
             </div>
           </div>

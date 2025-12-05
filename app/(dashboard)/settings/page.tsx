@@ -37,6 +37,11 @@ const SettingsPage = () => {
   const [editingInventoryId, setEditingInventoryId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [showDeleteInventoryModal, setShowDeleteInventoryModal] = useState(false);
+  const [inventoryToDelete, setInventoryToDelete] = useState<{id: string; name: string} | null>(null);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // Load settings from database
   useEffect(() => {
@@ -115,21 +120,22 @@ const SettingsPage = () => {
   };
 
   const handleDeleteInventory = async (id: string, name: string) => {
-    if (
-      !confirm(
-        `Delete inventory "${name}"? All products in this inventory will also be deleted.`
-      )
-    ) {
-      return;
-    }
+    setInventoryToDelete({ id, name });
+    setShowDeleteInventoryModal(true);
+  };
+
+  const confirmDeleteInventory = async () => {
+    if (!inventoryToDelete) return;
 
     try {
-      const response = await fetch(`/api/inventories/${id}`, {
+      const response = await fetch(`/api/inventories/${inventoryToDelete.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         await refreshInventories();
+        setShowDeleteInventoryModal(false);
+        setInventoryToDelete(null);
       } else {
         const data = await response.json();
         alert(data.error || "Failed to delete inventory");
@@ -248,13 +254,19 @@ const SettingsPage = () => {
 
       if (response.ok) {
         await refreshSettings(); // Refresh settings context
-        alert("Preferences saved successfully!");
+        setToastMessage("Preferences saved successfully!");
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
       } else {
-        alert("Failed to save preferences");
+        setToastMessage("Failed to save preferences");
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
       }
     } catch (error) {
       console.error("Save failed:", error);
-      alert("Failed to save preferences");
+      setToastMessage("Failed to save preferences");
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
     } finally {
       setSaving(false);
     }
@@ -612,6 +624,69 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Inventory Confirmation Modal */}
+      {showDeleteInventoryModal && inventoryToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800">
+                  Delete Inventory
+                </h2>
+                <p className="text-sm text-slate-500">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-600 mb-6">
+              Are you sure you want to delete inventory <strong>"{inventoryToDelete.name}"</strong>? All products in this inventory will also be permanently deleted.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteInventoryModal(false);
+                  setInventoryToDelete(null);
+                }}
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteInventory}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 z-50 animate-fade-in">
+          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+            <span className="text-green-600 font-bold">✓</span>
+          </div>
+          <p className="font-medium">{toastMessage}</p>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 z-50 animate-fade-in">
+          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+            <span className="text-red-600 font-bold">✕</span>
+          </div>
+          <p className="font-medium">{toastMessage}</p>
+        </div>
+      )}
     </main>
   );
 };
