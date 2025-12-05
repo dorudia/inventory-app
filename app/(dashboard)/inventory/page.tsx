@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Search, Filter, Package, Edit2, Trash2, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useInventory } from "@/contexts/InventoryContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface Product {
   _id: string;
@@ -17,6 +18,7 @@ interface Product {
 const InventoryPage = () => {
   const router = useRouter();
   const { activeInventory } = useInventory();
+  const { settings } = useSettings();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -260,7 +262,10 @@ const InventoryPage = () => {
                     </td>
                     <td className="px-6 py-2 whitespace-nowrap">
                       <p className="text-sm text-slate-600">
-                        ${product.price.toFixed(2)}
+                        {settings.currency === "lei"
+                          ? `${product.price.toFixed(2)} ${settings.currency}`
+                          : `${settings.currency}${product.price.toFixed(2)}`
+                        }
                       </p>
                     </td>
                     <td className="px-6 py-2 whitespace-nowrap">
@@ -355,7 +360,10 @@ const InventoryPage = () => {
                     Price
                   </label>
                   <p className="text-lg font-semibold text-green-600">
-                    ${selectedProduct.price.toFixed(2)}
+                    {settings.currency === "lei"
+                      ? `${selectedProduct.price.toFixed(2)} ${settings.currency}`
+                      : `${settings.currency}${selectedProduct.price.toFixed(2)}`
+                    }
                   </p>
                 </div>
                 <div>

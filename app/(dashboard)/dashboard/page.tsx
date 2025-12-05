@@ -20,6 +20,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useInventory } from "@/contexts/InventoryContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface DashboardData {
   metrics: {
@@ -45,19 +46,12 @@ interface DashboardData {
 
 const DashboardPage = () => {
   const { activeInventory } = useInventory();
+  const { settings } = useSettings();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [chartType, setChartType] = useState<"bar" | "area">("bar");
+  const [localChartType, setLocalChartType] = useState<"bar" | "area">("bar");
 
   useEffect(() => {
-    // Load saved chart preference
-    fetch("/api/settings")
-      .then((res) => res.json())
-      .then((settings) => {
-        setChartType(settings.chartType || "bar");
-      })
-      .catch((err) => console.error("Failed to load chart preference:", err));
-
     // Load dashboard data
     if (activeInventory) {
       fetch(`/api/dashboard?inventoryId=${activeInventory._id}`)
@@ -72,6 +66,13 @@ const DashboardPage = () => {
         });
     }
   }, [activeInventory]);
+
+  // Sync local chart type with settings on mount
+  useEffect(() => {
+    if (settings.chartType) {
+      setLocalChartType(settings.chartType);
+    }
+  }, [settings.chartType]);
 
   if (loading) {
     return (
@@ -134,7 +135,10 @@ const DashboardPage = () => {
                 <div>
                   <p className="text-sm text-slate-600">Total Value</p>
                   <p className="text-2xl font-bold text-slate-800">
-                    ${data.metrics.totalValue.toLocaleString()}
+                    {settings.currency === "lei"
+                      ? `${data.metrics.totalValue.toLocaleString()} ${settings.currency}`
+                      : `${settings.currency}${data.metrics.totalValue.toLocaleString()}`
+                    }
                   </p>
                 </div>
               </div>
@@ -161,31 +165,31 @@ const DashboardPage = () => {
             </h2>
             <div className="flex gap-2">
               <button
-                onClick={() => setChartType("bar")}
-                className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                  chartType === "bar"
-                    ? "bg-purple-100 text-purple-700"
-                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                onClick={() => setLocalChartType("bar")}
+                className={`p-2 rounded-lg transition-all ${
+                  localChartType === "bar"
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
                 }`}
                 title="Bar Chart"
               >
-                <BarChart3 className="w-4 h-4" />
+                <BarChart3 className="w-5 h-5" />
               </button>
               <button
-                onClick={() => setChartType("area")}
-                className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                  chartType === "area"
-                    ? "bg-purple-100 text-purple-700"
-                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                onClick={() => setLocalChartType("area")}
+                className={`p-2 rounded-lg transition-all ${
+                  localChartType === "area"
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
                 }`}
                 title="Area Chart"
               >
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="w-5 h-5" />
               </button>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={250}>
-            {chartType === "bar" ? (
+            {localChartType === "bar" ? (
               <BarChart data={data.weeklyData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="week" style={{ fontSize: "12px" }} />

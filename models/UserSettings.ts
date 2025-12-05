@@ -10,7 +10,7 @@ const UserSettingsSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ["$", "€", "£", "¥"],
+      enum: ["$", "€", "£", "¥", "lei"],
       default: "$",
     },
     dateFormat: {

@@ -1,5 +1,6 @@
 import Sidebar from "@/components/Sidebar";
 import { InventoryProvider } from "@/contexts/InventoryContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 
 export default function DashboardLayout({
   children,
@@ -7,9 +8,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <InventoryProvider>
-      <Sidebar />
-      {children}
-    </InventoryProvider>
+    <SettingsProvider>
+      <InventoryProvider>
+        <Sidebar />
+        {children}
+      </InventoryProvider>
+    </SettingsProvider>
   );
 }

@@ -17,9 +17,11 @@ import {
   X,
 } from "lucide-react";
 import { useInventory } from "@/contexts/InventoryContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const SettingsPage = () => {
   const { activeInventory, inventories, refreshInventories } = useInventory();
+  const { refreshSettings } = useSettings();
   const [currency, setCurrency] = useState("$");
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
   const [chartType, setChartType] = useState<"bar" | "area">("bar");
@@ -32,6 +34,9 @@ const SettingsPage = () => {
   const [selectedInventoryForSharing, setSelectedInventoryForSharing] =
     useState<string | null>(null);
   const [newEmailToShare, setNewEmailToShare] = useState("");
+  const [editingInventoryId, setEditingInventoryId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // Load settings from database
   useEffect(() => {
@@ -202,6 +207,36 @@ const SettingsPage = () => {
     }
   };
 
+  const handleUpdateInventory = async (inventoryId: string) => {
+    if (!editName.trim()) {
+      alert("Please enter an inventory name");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/inventories/${inventoryId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          description: editDescription,
+        }),
+      });
+
+      if (response.ok) {
+        setEditingInventoryId(null);
+        setEditName("");
+        setEditDescription("");
+        await refreshInventories();
+      } else {
+        alert("Failed to update inventory");
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Failed to update inventory");
+    }
+  };
+
   const handleSavePreferences = async () => {
     setSaving(true);
     try {
@@ -212,6 +247,7 @@ const SettingsPage = () => {
       });
 
       if (response.ok) {
+        await refreshSettings(); // Refresh settings context
         alert("Preferences saved successfully!");
       } else {
         alert("Failed to save preferences");
@@ -284,6 +320,7 @@ const SettingsPage = () => {
                     <option value="€">€ (EUR)</option>
                     <option value="£">£ (GBP)</option>
                     <option value="¥">¥ (JPY)</option>
+                    <option value="lei">lei (RON)</option>
                   </select>
                 </div>
 
@@ -424,49 +461,97 @@ const SettingsPage = () => {
             <div className="space-y-2">
               {inventories.map((inv) => (
                 <div key={inv._id} className="p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-800">
-                        {inv.name}
-                        {inv.isDefault && (
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                            Default
-                          </span>
-                        )}
-                      </p>
-                      {inv.description && (
-                        <p className="text-xs text-slate-500">
-                          {inv.description}
-                        </p>
-                      )}
+                  {editingInventoryId === inv._id ? (
+                    <div className="mb-2">
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="Inventory name"
+                        className="w-full px-3 py-2 mb-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                      <input
+                        type="text"
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        placeholder="Description (optional)"
+                        className="w-full px-3 py-2 mb-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleUpdateInventory(inv._id)}
+                          className="flex-1 bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingInventoryId(null);
+                            setEditName("");
+                            setEditDescription("");
+                          }}
+                          className="px-3 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() =>
-                          setSelectedInventoryForSharing(
-                            selectedInventoryForSharing === inv._id
-                              ? null
-                              : inv._id
-                          )
-                        }
-                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer"
-                        title="Share Inventory"
-                      >
-                        <UserPlus className="w-4 h-4" />
-                      </button>
-                      {inventories.length > 1 && (
+                  ) : (
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-800">
+                          {inv.name}
+                          {inv.isDefault && (
+                            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                              Default
+                            </span>
+                          )}
+                        </p>
+                        {inv.description && (
+                          <p className="text-xs text-slate-500">
+                            {inv.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingInventoryId(inv._id);
+                            setEditName(inv.name);
+                            setEditDescription(inv.description || "");
+                          }}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          title="Edit Inventory"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() =>
-                            handleDeleteInventory(inv._id, inv.name)
+                            setSelectedInventoryForSharing(
+                              selectedInventoryForSharing === inv._id
+                                ? null
+                                : inv._id
+                            )
                           }
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                          title="Delete Inventory"
+                          className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer"
+                          title="Share Inventory"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <UserPlus className="w-4 h-4" />
                         </button>
-                      )}
+                        {inventories.length > 1 && (
+                          <button
+                            onClick={() =>
+                              handleDeleteInventory(inv._id, inv.name)
+                            }
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            title="Delete Inventory"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Email sharing section */}
                   {selectedInventoryForSharing === inv._id && (

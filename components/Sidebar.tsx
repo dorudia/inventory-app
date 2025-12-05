@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useInventory } from "@/contexts/InventoryContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface Stats {
   totalProducts: number;
@@ -28,6 +29,7 @@ const Sidebar = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const { inventories, activeInventory, setActiveInventory, loading } =
     useInventory();
+  const { settings } = useSettings();
   const [showInventoryDropdown, setShowInventoryDropdown] = useState(false);
 
   useEffect(() => {
@@ -144,7 +146,10 @@ const Sidebar = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-300">Total Value</span>
                 <span className="font-semibold text-green-400">
-                  ${stats.totalValue.toLocaleString()}
+                  {settings.currency === "lei" 
+                    ? `${stats.totalValue.toLocaleString()} ${settings.currency}`
+                    : `${settings.currency}${stats.totalValue.toLocaleString()}`
+                  }
                 </span>
               </div>
               {stats.lowStockCount > 0 && (
