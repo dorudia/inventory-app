@@ -11,8 +11,9 @@ export default async function Home() {
             Inventory Management
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Manage multiple inventories, track stock levels, and collaborate with your team.
-            Real-time analytics, customizable currency, and seamless sharing.
+            Manage multiple inventories, track stock levels, and collaborate
+            with your team. Real-time analytics, customizable currency, and
+            seamless sharing.
           </p>
           <div className="flex gap-4 justify-center">
             <SignedOut>

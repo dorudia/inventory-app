@@ -76,7 +76,7 @@ const DashboardPage = () => {
 
   if (loading) {
     return (
-      <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+      <main className="p-8 md:ml-64 bg-slate-100 min-h-screen">
         <div className="flex items-center justify-center h-96">
           <div className="text-lg text-slate-500">Loading...</div>
         </div>
@@ -86,7 +86,7 @@ const DashboardPage = () => {
 
   if (!data) {
     return (
-      <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+      <main className="px-4 py-8 md:px-8 md:ml-64 bg-slate-100 min-h-screen">
         <div className="flex items-center justify-center h-96">
           <div className="text-lg text-red-500">
             Failed to load dashboard data
@@ -96,7 +96,7 @@ const DashboardPage = () => {
     );
   }
   return (
-    <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+    <main className="px-4 py-8 md:px-8 md:ml-64 bg-slate-100 min-h-screen">
       {/* Header */}
       <div className="p-6-80">
         <div className="mb-8">
@@ -130,9 +130,12 @@ const DashboardPage = () => {
               <p className="text-sm text-slate-600 flex-1">Total Value</p>
               <p className="text-xl font-bold text-slate-800">
                 {settings.currency === "lei"
-                  ? `${data.metrics.totalValue.toLocaleString()} ${settings.currency}`
-                  : `${settings.currency}${data.metrics.totalValue.toLocaleString()}`
-                }
+                  ? `${data.metrics.totalValue.toLocaleString()} ${
+                      settings.currency
+                    }`
+                  : `${
+                      settings.currency
+                    }${data.metrics.totalValue.toLocaleString()}`}
               </p>
             </div>
             <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
@@ -183,44 +186,50 @@ const DashboardPage = () => {
               </button>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            {localChartType === "bar" ? (
-              <BarChart data={data.weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" style={{ fontSize: "12px" }} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="products" fill="#7c3aed" />
-              </BarChart>
-            ) : (
-              <AreaChart data={data.weeklyData}>
-                <defs>
-                  <linearGradient
-                    id="colorProducts"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" style={{ fontSize: "12px" }} />
-                <YAxis />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey="products"
-                  stroke="#7c3aed"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorProducts)"
-                />
-              </AreaChart>
-            )}
-          </ResponsiveContainer>
+          <div className="-ml-10">
+            <ResponsiveContainer width="100%" height={250}>
+              {localChartType === "bar" ? (
+                <BarChart data={data.weeklyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" style={{ fontSize: "12px" }} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="products" fill="#7c3aed" />
+                </BarChart>
+              ) : (
+                <AreaChart data={data.weeklyData}>
+                  <defs>
+                    <linearGradient
+                      id="colorProducts"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8} />
+                      <stop
+                        offset="95%"
+                        stopColor="#7c3aed"
+                        stopOpacity={0.1}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" style={{ fontSize: "12px" }} />
+                  <YAxis />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="products"
+                    stroke="#7c3aed"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorProducts)"
+                  />
+                </AreaChart>
+              )}
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Stock Levels */}
@@ -248,11 +257,15 @@ const DashboardPage = () => {
                   key={idx}
                   className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg"
                 >
-                  <div className={`w-2.5 h-2.5 rounded-full ${statusColor}`}></div>
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${statusColor}`}
+                  ></div>
                   <p className="text-sm font-medium text-slate-800 flex-1">
                     {product.name}
                   </p>
-                  <p className="text-xs text-slate-500 min-w-20">{statusText}</p>
+                  <p className="text-xs text-slate-500 min-w-20">
+                    {statusText}
+                  </p>
                   <p className="text-sm font-semibold text-slate-700 min-w-10 text-right">
                     {product.quantity}
                   </p>
@@ -268,7 +281,10 @@ const DashboardPage = () => {
             Efficiency
           </h2>
           <div className="flex items-center justify-center">
-            <div className="relative w-36 h-36" style={{ transform: 'scale(1.5)' }}>
+            <div
+              className="relative w-36 h-36"
+              style={{ transform: "scale(1.20)" }}
+            >
               <svg className="w-full h-full transform -rotate-90">
                 <circle
                   cx="72"

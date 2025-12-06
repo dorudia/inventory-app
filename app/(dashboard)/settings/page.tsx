@@ -34,11 +34,17 @@ const SettingsPage = () => {
   const [selectedInventoryForSharing, setSelectedInventoryForSharing] =
     useState<string | null>(null);
   const [newEmailToShare, setNewEmailToShare] = useState("");
-  const [editingInventoryId, setEditingInventoryId] = useState<string | null>(null);
+  const [editingInventoryId, setEditingInventoryId] = useState<string | null>(
+    null
+  );
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [showDeleteInventoryModal, setShowDeleteInventoryModal] = useState(false);
-  const [inventoryToDelete, setInventoryToDelete] = useState<{id: string; name: string} | null>(null);
+  const [showDeleteInventoryModal, setShowDeleteInventoryModal] =
+    useState(false);
+  const [inventoryToDelete, setInventoryToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -273,7 +279,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+    <main className="px-4 py-8 md:px-8 md:ml-64 bg-slate-100 min-h-screen">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-800">Settings</h1>
@@ -627,45 +633,58 @@ const SettingsPage = () => {
 
       {/* Delete Inventory Confirmation Modal */}
       {showDeleteInventoryModal && inventoryToDelete && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 z-40"
+            onClick={() => {
+              setShowDeleteInventoryModal(false);
+              setInventoryToDelete(null);
+            }}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 pointer-events-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Delete Inventory
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    This action cannot be undone
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
-                  Delete Inventory
-                </h2>
-                <p className="text-sm text-slate-500">
-                  This action cannot be undone
-                </p>
+
+              <p className="text-slate-600 mb-6">
+                Are you sure you want to delete inventory{" "}
+                <strong>"{inventoryToDelete.name}"</strong>? All products in
+                this inventory will also be permanently deleted.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteInventoryModal(false);
+                    setInventoryToDelete(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteInventory}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                >
+                  Delete
+                </button>
               </div>
-            </div>
-
-            <p className="text-slate-600 mb-6">
-              Are you sure you want to delete inventory <strong>"{inventoryToDelete.name}"</strong>? All products in this inventory will also be permanently deleted.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteInventoryModal(false);
-                  setInventoryToDelete(null);
-                }}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeleteInventory}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-              >
-                Delete
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Success Toast */}

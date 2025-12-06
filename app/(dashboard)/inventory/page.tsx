@@ -153,7 +153,7 @@ const InventoryPage = () => {
   };
 
   return (
-    <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+    <main className="p-8 md:ml-64 bg-slate-100 min-h-screen">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-800">Inventory</h1>
@@ -163,12 +163,14 @@ const InventoryPage = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white p-6 rounded-lg shadow border border-slate-200 mb-6">
+      <div className="bg-white p-6 rounded-lg shadow border border-slate-200 mb-6 relative z-0">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
             <input
+              id="product-search"
+              name="search"
               type="text"
               placeholder="Search products..."
               value={search}
@@ -181,6 +183,8 @@ const InventoryPage = () => {
           <div className="relative">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
             <select
+              id="product-filter"
+              name="filter"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="pl-10 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white cursor-pointer"
@@ -277,8 +281,7 @@ const InventoryPage = () => {
                       <p className="text-sm text-slate-600">
                         {settings.currency === "lei"
                           ? `${product.price.toFixed(2)} ${settings.currency}`
-                          : `${settings.currency}${product.price.toFixed(2)}`
-                        }
+                          : `${settings.currency}${product.price.toFixed(2)}`}
                       </p>
                     </td>
                     <td className="px-6 py-2 whitespace-nowrap">
@@ -343,200 +346,236 @@ const InventoryPage = () => {
 
       {/* Product Details Modal */}
       {showDetailsModal && selectedProduct && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-slate-800">
-                Product Details
-              </h2>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-slate-600">
-                  Product Name
-                </label>
-                <p className="text-lg font-semibold text-slate-800">
-                  {selectedProduct.name}
-                </p>
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 z-40"
+            onClick={() => setShowDetailsModal(false)}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 pointer-events-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-slate-800">
+                  Product Details
+                </h2>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-slate-600">
-                    Price
-                  </label>
-                  <p className="text-lg font-semibold text-green-600">
-                    {settings.currency === "lei"
-                      ? `${selectedProduct.price.toFixed(2)} ${settings.currency}`
-                      : `${settings.currency}${selectedProduct.price.toFixed(2)}`
-                    }
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600">
-                    Quantity
+                    Product Name
                   </label>
                   <p className="text-lg font-semibold text-slate-800">
-                    {selectedProduct.quantity}
+                    {selectedProduct.name}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">
+                      Price
+                    </label>
+                    <p className="text-lg font-semibold text-green-600">
+                      {settings.currency === "lei"
+                        ? `${selectedProduct.price.toFixed(2)} ${
+                            settings.currency
+                          }`
+                        : `${settings.currency}${selectedProduct.price.toFixed(
+                            2
+                          )}`}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">
+                      Quantity
+                    </label>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedProduct.quantity}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">
+                      Low Stock Alert
+                    </label>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedProduct.lowStockAt}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">
+                      Status
+                    </label>
+                    <div className="mt-1">
+                      {getStatusBadge(selectedProduct)}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-600">
+                    Total Value
+                  </label>
+                  <p className="text-lg font-semibold text-purple-600">
+                    $
+                    {(selectedProduct.price * selectedProduct.quantity).toFixed(
+                      2
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-600">
+                    Added On
+                  </label>
+                  <p className="text-slate-800">
+                    {new Date(selectedProduct.createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-600">
-                    Low Stock Alert
-                  </label>
-                  <p className="text-lg font-semibold text-slate-800">
-                    {selectedProduct.lowStockAt}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600">
-                    Status
-                  </label>
-                  <div className="mt-1">{getStatusBadge(selectedProduct)}</div>
-                </div>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    router.push(`/edit-product/${selectedProduct._id}`);
+                  }}
+                  className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
+                >
+                  Edit Product
+                </button>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
               </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-600">
-                  Total Value
-                </label>
-                <p className="text-lg font-semibold text-purple-600">
-                  $
-                  {(selectedProduct.price * selectedProduct.quantity).toFixed(
-                    2
-                  )}
-                </p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-600">
-                  Added On
-                </label>
-                <p className="text-slate-800">
-                  {new Date(selectedProduct.createdAt).toLocaleDateString(
-                    "en-US",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDetailsModal(false);
-                  router.push(`/edit-product/${selectedProduct._id}`);
-                }}
-                className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
-              >
-                Edit Product
-              </button>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                Close
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 z-40"
+            onClick={() => {
+              setShowDeleteModal(false);
+              setProductToDelete(null);
+            }}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 pointer-events-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Delete Product
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    This action cannot be undone
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
-                  Delete Product
-                </h2>
-                <p className="text-sm text-slate-500">
-                  This action cannot be undone
-                </p>
+
+              <p className="text-slate-600 mb-6">
+                Are you sure you want to delete this product? All product data
+                will be permanently removed.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setProductToDelete(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                >
+                  Delete
+                </button>
               </div>
-            </div>
-
-            <p className="text-slate-600 mb-6">
-              Are you sure you want to delete this product? All product data will be permanently removed.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setProductToDelete(null);
-                }}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-              >
-                Delete
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 z-40"
+            onClick={() => setShowBulkDeleteModal(false)}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 pointer-events-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Delete Multiple Products
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    This action cannot be undone
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
-                  Delete Multiple Products
-                </h2>
-                <p className="text-sm text-slate-500">
-                  This action cannot be undone
-                </p>
+
+              <p className="text-slate-600 mb-6">
+                Are you sure you want to delete{" "}
+                <strong>{selectedProducts.length}</strong>{" "}
+                {selectedProducts.length === 1 ? "product" : "products"}? All
+                data will be permanently removed.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowBulkDeleteModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmBulkDelete}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                >
+                  Delete All
+                </button>
               </div>
-            </div>
-
-            <p className="text-slate-600 mb-6">
-              Are you sure you want to delete <strong>{selectedProducts.length}</strong> {selectedProducts.length === 1 ? 'product' : 'products'}? All data will be permanently removed.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowBulkDeleteModal(false)}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmBulkDelete}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-              >
-                Delete All
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </main>
   );

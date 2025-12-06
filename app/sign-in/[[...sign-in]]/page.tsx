@@ -8,7 +8,8 @@ export default function SignInPage() {
           Inventory Management
         </h1>
         <p className="text-slate-600">
-          Manage multiple inventories, track stock levels, and collaborate with your team
+          Manage multiple inventories, track stock levels, and collaborate with
+          your team
         </p>
       </div>
       <SignIn />

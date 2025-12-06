@@ -79,7 +79,7 @@ const EditProductPage = () => {
 
   if (loading) {
     return (
-      <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+      <main className="p-8 md:ml-64 bg-slate-100 min-h-screen">
         <div className="flex items-center justify-center h-96">
           <div className="text-lg text-slate-500">Loading...</div>
         </div>
@@ -88,7 +88,7 @@ const EditProductPage = () => {
   }
 
   return (
-    <main className="p-8 ml-64 bg-slate-100 min-h-screen">
+    <main className="p-8 md:ml-64 bg-slate-100 min-h-screen">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-800">Edit Product</h1>
